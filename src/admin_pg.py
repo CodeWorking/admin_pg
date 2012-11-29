@@ -18,19 +18,35 @@ def logout():
     #return redirect(url_for('home'))
     return render_template('logout.html')
 
+@app.route('/createuser', methods=['GET', 'POST'])
+def createuser():
+    opts={}
+    if session.get('user'):
+        if request.method == 'POST':
+            conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (session.get("host"), session.get("dbname"), session.get("user"), session.get("password"))
+            try:
+                username = request.form["username"]
+                userpass = request.form["userpass"]
+                conn = psycopg2.connect(conn_string)
+                cursor = conn.cursor()
+                cursor.execute ("create user %s with password '%s'" % (username,userpass))
+                conn.commit()
+            except:
+                opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
+    else:
+        return redirect(url_for('home'))
+    return render_template('createuser.html', **opts)
+
 @app.route('/users')
 def users():
     opts={}
     if session.get('user'):
         conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (session.get("host"), session.get("dbname"), session.get("user"), session.get("password"))
         try:
-            conn = psycopg2.connect(conn_string)
-            cursor = conn.cursor()
-            opts["users"] = []
-            cursor.execute ("select * from pg_roles where rolname != '%s'" % (session.get("user")))
-            for record in cursor:
-				opts["users"].append({"name":record[0], "id":record[-1]})
-            session["users"] = opts["users"]
+            if request.method == 'POST':
+                conn = psycopg2.connect(conn_string)
+                cursor = conn.cursor()
+                cursor.execute ("select * from pg_roles where rolname != '%s'" % (session.get("user")))
         except:
             opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
     else:

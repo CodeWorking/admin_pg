@@ -1,10 +1,139 @@
-<ul>
-{% for user in users %}
-	<li><a href="/user/{{ user.name }}/">{{ user.name }}</a></li>
-{% endfor %}
-</ul>
+﻿<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="content-language" content="en" />
+	<meta name="robots" content="noindex,nofollow" />
+	<link rel="stylesheet" media="screen,projection" type="text/css" href="{{ url_for('static', filename='reset.css') }}" />
+	<link rel="stylesheet" media="screen,projection" type="text/css" href="{{ url_for('static', filename='main.css') }}" />
+	<link rel="stylesheet" media="screen,projection" type="text/css" href="{{ url_for('static', filename='2col.css') }}" title="2col" />
+	<link rel="alternate stylesheet" media="screen,projection" type="text/css" href="{{ url_for('static', filename='1col.css') }}" title="1col" />
+	<link rel="stylesheet" media="screen,projection" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+	<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='switcher.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='toggle.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='ui.core.js') }}"></script>	
+	<title>Módulo de Administración CondorSOF</title>
+</head>
 
-{% block content %}
-{% endblock %}
+<body>
 
-<a href="/logout">salir</a>
+<div id="main">
+	<div id="tray" class="box">
+		<p class="f-left box">
+			<span class="f-left" id="switcher">
+				<a href="" rel="1col" class="styleswitch ico-col1" title="Display one column"><img src="{{ url_for('static', filename='switcher-1col.gif') }}" alt="1 Column" /></a>
+				<a href="" rel="2col" class="styleswitch ico-col2" title="Display two columns"><img src="{{ url_for('static', filename='switcher-2col.gif') }}" alt="2 Columns" /></a>
+			</span>
+
+			Proyecto: <strong>Módulo de Administración CondorSOF</strong>
+
+		</p>
+
+		<p class="f-right">Usuario: <strong><a href="#">Administrator</a></strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong><a href="/logout">Salir</a></strong></p>
+
+	</div>
+
+	<hr class="noscreen" />
+
+	<div id="menu" class="box">
+
+		<ul class="box">
+			<li id="menu-active"><a href="#"><span>Permisos</span></a></li> <!-- Active -->
+			<li><a href="#"><span>Roles</span></a></li>
+			<li><a href="#"><span>Casos de Uso</span></a></li>
+			<li><a href="#"><span>Creación de Usuarios/Roles</span></a></li>
+		</ul>
+
+	</div>
+
+	<hr class="noscreen" />
+
+	<div id="cols" class="box">
+
+		<div id="aside" class="box">
+
+			<div class="padding box">
+
+				<p id="logo"><a href="#"><img src="{{ url_for('static', filename='logo.gif') }}" alt="Our logo" title="Visit Site" /></a></p>
+
+				<p id="btn-create" class="box"><a href="#"><span>Create a new project</span></a></p>
+
+			</div>
+			
+			<a href="/createuser">Crear Usuarios</a>
+
+			<ul class="box">
+				{% for user in users %}
+					<li><a href="/user/{{ user.name }}/">{{ user.name }}</a></li>
+				{% endfor %}
+			</ul>
+
+		</div>
+
+		<hr class="noscreen" />
+
+		<div id="content" class="box">
+
+			<h1>Usuario/Rol</h1>
+
+			{% block content %}
+			{% endblock %}
+
+			<h3 class="tit">Form</h3>
+			<fieldset>
+				<legend>Legend</legend>
+				<table class="nostyle">
+					<tr>
+						<td style="width:70px;">Input:</td>
+						<td><input type="text" size="40" name="" class="input-text" /></td>
+					</tr>
+					<tr>
+						<td>Input:</td>
+						<td><input type="text" size="40" name="" class="input-text" disabled="disabled" /></td>
+					</tr>
+					<tr>
+						<td class="va-top">Input:</td>
+						<td><textarea cols="75" rows="7" class="input-text"></textarea></td>
+					</tr>
+					<tr>
+						<td>Input:</td>
+						<td>
+							<label><input type="checkbox" /> Lorem ipsum</label> &nbsp;
+							<label><input type="checkbox" /> Lorem ipsum</label> &nbsp;
+							<label><input type="checkbox" /> Lorem ipsum</label>
+						</td>
+					</tr>
+					<tr>
+						<td>Input:</td>
+						<td>
+							<label><input type="radio" /> Lorem ipsum</label> &nbsp;
+							<label><input type="radio" /> Lorem ipsum</label> &nbsp;
+							<label><input type="radio" /> Lorem ipsum</label>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="t-right"><input type="submit" class="input-submit" value="Submit" /></td>
+					</tr>
+				</table>
+			</fieldset>
+
+		</div>
+
+	</div>
+
+	<hr class="noscreen" />
+
+	<div id="footer" class="box">
+
+		<p class="f-left">&copy; 2012 <a href="#">Universidad Distrital</a>, Todos los derechos reservados &reg;</p>
+
+		<p class="f-right">Templates by <a href="http://www.adminizio.com/">Adminizio</a></p>
+
+	</div>
+
+</div>
+
+</body>
+</html>
