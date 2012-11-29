@@ -1,30 +1,45 @@
 ﻿{% extends 'users.html' %}
+{% block navigation %}		
+<ul id="navigation">
+	<li><span class="active">Usuarios</span></li>
+	<li><a href="#">Roles</a></li>
+	<li><a href="#">Casos de Uso</a></li>
+	<li><a href="#">Creación de Usuarios/Roles</a></li>
+</ul>
+{% endblock %}
 {% block content %}
-<!-- Table (TABLE) -->
-<h3 class="tit">Table</h3>
-<table>
-	<tr>
-		<th>NOMBRE TABLA</th>
-		<th>CONSULTA</th>
-		<th>INSERCIÓN</th>
-		<th>ACTUALIZAR</th>
-		<th>BORRAR</th>
-		<th>TRUNCAR</th>
-		<th>CREAR LLAVES FORÁNEAS</th>
-	</tr>
+<h3>Table</h3>
 <form method="post">
-{% for table in tables %}		
-	<tr>
-		<td>{{ table.name }}</td>
-		<td><input type="checkbox" name="{{ table.name }}" value="select" {% if 'SELECT' in table.privs %} checked{% endif %}></td>
-		<td><input type="checkbox" name="{{ table.name }}" value="insert" {% if 'INSERT' in table.privs %} checked{% endif %}></td>
-		<td><input type="checkbox" name="{{ table.name }}" value="update" {% if 'UPDATE' in table.privs %} checked{% endif %}></td>
-		<td><input type="checkbox" name="{{ table.name }}" value="delete" {% if 'DELETE' in table.privs %} checked{% endif %}></td>
-		<td><input type="checkbox" name="{{ table.name }}" value="truncate" {% if 'TRUNCATE' in table.privs %} checked{% endif %}></td>
-		<td><input type="checkbox" name="{{ table.name }}" value="references" {% if 'REFERENCES' in table.privs %} checked{% endif %}></td>
-	</tr>
-{% endfor %}
-</table>
+	<table border="0" width="100%" cellpadding="3" cellspacing="2">
+		<tr>
+			<td>Tabla</td>
+			<td WIDTH="30">SELECT</td>
+			<td>INSERT</td>
+			<td>UPDATE</td>
+			<td>DELETE</td>
+			<td>TRUNCATE</td>
+			<td>REFERENCES</td>
+		</tr>
+		{% for table in tables %}
+		<tr>
+			<td>{{ table.name }}</td>
+			<td WIDTH="20"><input type="checkbox" name="{{ table.name }}" value="select" {% if 'SELECT' in table.privs %} checked{% endif %}></td>
+			<td><input type="checkbox" name="{{ table.name }}" value="insert" {% if 'INSERT' in table.privs %} checked{% endif %}></td>
+			<td><input type="checkbox" name="{{ table.name }}" value="update" {% if 'UPDATE' in table.privs %} checked{% endif %}></td>
+			<td><input type="checkbox" name="{{ table.name }}" value="delete" {% if 'DELETE' in table.privs %} checked{% endif %}></td>
+			<td><input type="checkbox" name="{{ table.name }}" value="truncate" {% if 'TRUNCATE' in table.privs %} checked{% endif %}></td>
+			<td><input type="checkbox" name="{{ table.name }}" value="references" {% if 'REFERENCES' in table.privs %} checked{% endif %}></td>
+		</tr>
+		{% endfor %}
+	</table>
 <input type="submit" value="Actualizar">
 </form>
+{% endblock %}
+{% block sidebar %}
+<h2>Usuarios</h2>
+<ol type=none>
+	{% for user in users %}
+	<li><a href="/user/{{ user.name }}/">{{ user.name }}</a></li>
+	{% endfor %}					
+</ol>
 {% endblock %}

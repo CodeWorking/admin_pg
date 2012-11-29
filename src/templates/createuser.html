@@ -1,4 +1,14 @@
-{% extends 'users.html' %}
+﻿{% extends 'users.html' %}
+
+{% block navigation %}		
+<ul id="navigation">
+	<li><a href="/users">Usuarios</span></li>
+	<li><a href="#">Roles</a></li>
+	<li><a href="#">Casos de Uso</a></li>
+	<li><span class="active">Creación de Usuarios/Roles</a></li>
+</ul>
+{% endblock %}
+
 {% block content %}
 <form method="post">
 Usuario: <input type="text" name="username"><br>
