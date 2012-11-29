@@ -46,6 +46,13 @@ def userid(user_id):
         try:
             conn = psycopg2.connect(conn_string)
             if request.method == 'POST':
+                cursor = conn.cursor()
+                cursor.execute ("select tablename from pg_tables where schemaname = 'public';")
+                tablas = cursor.fetchall()
+                for tabla in tablas:
+                    cursor = conn.cursor()
+                    cursor.execute("revoke all privileges on %s from %s" %(tabla[0],user_id))
+                    print "revoke all privileges on %s from %s" %(tabla[0],user_id)
                 for k in request.form.keys():
                     for pr in request.values.getlist(k):
                         cursor = conn.cursor()
