@@ -1,0 +1,15 @@
+{% extends 'users.html' %}
+
+{% block content %}
+<form method="post">
+{% for table in tables %}
+{{ table.name }}&nbsp;&nbsp;&nbsp;
+SELECT <input type="checkbox" name="{{ table.name }}" value="select" {% if 'SELECT' in table.privs %} checked{% endif %}>&nbsp;
+INSERT <input type="checkbox" name="{{ table.name }}" value="insert" {% if 'INSERT' in table.privs %} checked{% endif %}>&nbsp;
+UPDATE <input type="checkbox" name="{{ table.name }}" value="update" {% if 'UPDATE' in table.privs %} checked{% endif %}>&nbsp;
+DELETE <input type="checkbox" name="{{ table.name }}" value="delete" {% if 'DELETE' in table.privs %} checked{% endif %}>&nbsp;
+TRUNCATE <input type="checkbox" name="{{ table.name }}" value="truncate" {% if 'TRUNCATE' in table.privs %} checked{% endif %}><br/>
+{% endfor %}
+<input type="submit" value="Actualizar">
+</form>
+{% endblock %}

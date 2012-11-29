@@ -5,7 +5,6 @@ import psycopg2
 # configuration
 DEBUG = True
 SECRET_KEY = 'jwj2hw82823j1j23njh1hn2h3h8sk289'
-CSRF_ENABLED = False
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -19,29 +18,77 @@ def logout():
     #return redirect(url_for('home'))
     return render_template('logout.html')
 
+@app.route('/users')
+def users():
+    opts={}
+    if session.get('user'):
+        conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (session.get("host"), session.get("dbname"), session.get("user"), session.get("password"))
+        try:
+            conn = psycopg2.connect(conn_string)
+            cursor = conn.cursor()
+            opts["users"] = []
+            cursor.execute ("select * from pg_roles where rolname != '%s'" % (session.get("user")))
+            for record in cursor:
+				opts["users"].append({"name":record[0], "id":record[-1]})
+            session["users"] = opts["users"]
+        except:
+            opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
+    else:
+        return redirect(url_for('home'))
+    return render_template('users.html', **opts)
+
+@app.route('/user/<user_id>/', methods=['GET', 'POST'])
+def userid(user_id):
+    opts={}
+    if session.get("user"):
+        opts["users"] = session.get("users")
+        conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (session.get("host"), session.get("dbname"), session.get("user"), session.get("password"))
+        try:
+            conn = psycopg2.connect(conn_string)
+            if request.method == 'POST':
+                for k in request.form.keys():
+                    for pr in request.values.getlist(k):
+                        cursor = conn.cursor()
+                        cursor.execute("grant %s on %s to %s" %(pr,k,user_id))
+                        print "grant %s on %s to %s" %(pr,k,user_id)
+                    conn.commit()
+            opts["tables"] = []
+            cursor = conn.cursor()
+            cursor.execute ("select * from pg_tables where schemaname = 'public'")
+            for table in cursor:
+                tabs = {}
+                cursor1 = conn.cursor()
+                cursor1.execute ("select privilege_type from information_schema.role_table_grants as tabs where table_name = '%s' and tabs.grantee = '%s'" %(table[1],user_id))
+                opts["tables"].append({"name":table[1], "privs":[i[0] for i in cursor1.fetchall()]})
+        except:
+            opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
+    else:
+        return redirect(url_for('home'))
+    return render_template('user.html', **opts)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     opts = {}
     if session.get('user'):
-        opts["STATUS"] = "OK"
+        return redirect(url_for('users'))
     else:
         if request.method == 'POST':
             user = request.form["user"]
             password = request.form["password"]
             host = request.form["host"]
-            conn_string = "host='%s' dbname='postgres' user='%s' password='%s'" % (host, user, password)
+            dbname = request.form["dbname"]
+            conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (host, dbname, user, password)
             try:
                 conn = psycopg2.connect(conn_string)
                 conn.cursor()
                 session["user"] = user
                 session["password"] = password
                 session["host"] = host
-                opts["STATUS"] = "OK"
+                session["dbname"] = dbname
+                return redirect(url_for('users'))
             except:
                 opts["errors"] = u"Error en la conexión de la base de datos Verifique el host o el usuario"
     return render_template('index.html', **opts)
-
 
 if __name__ == '__main__':
     app.run()

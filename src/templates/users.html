@@ -1,0 +1,12 @@
+<p>Se conecto</p>
+
+<ul>
+{% for user in users %}
+	<li><a href="/user/{{ user.name }}/">{{ user.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% block content %}
+{% endblock %}
+
+<a href="/logout">salir</a>
