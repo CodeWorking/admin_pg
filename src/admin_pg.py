@@ -10,6 +10,11 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 
+CASO_USO = {"Caso 1": ["GRANT select on emjav_data_horario_wl_banderas to %s",
+                       "GRANT insert on emjav_data_horario_wl_banderas to %s"],
+            "Caso 2": ["GRANT select on emjav_data_horario_wl_banderas to %s",
+                       "GRANT insert on emjav_data_horario_wl_banderas to %s"],}
+
 @app.route('/logout')
 def logout():
     session.pop("user")
@@ -43,10 +48,13 @@ def users():
     if session.get('user'):
         conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (session.get("host"), session.get("dbname"), session.get("user"), session.get("password"))
         try:
-            if request.method == 'POST':
-                conn = psycopg2.connect(conn_string)
-                cursor = conn.cursor()
-                cursor.execute ("select * from pg_roles where rolname != '%s'" % (session.get("user")))
+            conn = psycopg2.connect(conn_string)
+            cursor = conn.cursor()
+            opts["users"] = []
+            cursor.execute ("select * from pg_roles where rolname != '%s'" % (session.get("user")))
+            for record in cursor:
+				opts["users"].append({"name":record[0], "id":record[-1]})
+            session["users"] = opts["users"]
         except:
             opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
     else:
@@ -70,12 +78,19 @@ def userid(user_id):
                     cursor.execute("revoke all privileges on %s from %s" %(tabla[0],user_id))
                     print "revoke all privileges on %s from %s" %(tabla[0],user_id)
                 for k in request.form.keys():
-                    for pr in request.values.getlist(k):
-                        cursor = conn.cursor()
-                        cursor.execute("grant %s on %s to %s" %(pr,k,user_id))
-                        print "grant %s on %s to %s" %(pr,k,user_id)
-                    conn.commit()
+                    if k.startswith("caso_uso_"):
+                        for gg in CASO_USO[k.replace("caso_uso_", "")]:
+                            cursor = conn.cursor()
+                            cursor.execute(gg % (user_id))
+                    else:
+                        for pr in request.values.getlist(k):
+                            cursor = conn.cursor()
+                            cursor.execute("grant %s on %s to %s" %(pr,k,user_id))
+
+                conn.commit()
+                
             opts["tables"] = []
+            opts["casos_uso"] = []
             cursor = conn.cursor()
             cursor.execute ("select * from pg_tables where schemaname = 'public'")
             for table in cursor:
@@ -83,6 +98,8 @@ def userid(user_id):
                 cursor1 = conn.cursor()
                 cursor1.execute ("select privilege_type from information_schema.role_table_grants as tabs where table_name = '%s' and tabs.grantee = '%s'" %(table[1],user_id))
                 opts["tables"].append({"name":table[1], "privs":[i[0] for i in cursor1.fetchall()]})
+            for cc in CASO_USO:
+                opts["casos_uso"].append({"name":cc, "selected":False})
         except:
             opts["errors"] = u"Error en la conexión de la base de datos. Verifique el host o el usuario"
     else:
@@ -109,7 +126,8 @@ def home():
                 session["host"] = host
                 session["dbname"] = dbname
                 return redirect(url_for('users'))
-            except:
+            except Exception as ee:
+                print ee
                 opts["errors"] = u"Error en la conexión de la base de datos Verifique el host o el usuario"
     return render_template('index.html', **opts)
 

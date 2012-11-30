@@ -31,7 +31,11 @@
 			<td><input type="checkbox" name="{{ table.name }}" value="references" {% if 'REFERENCES' in table.privs %} checked{% endif %}></td>
 		</tr>
 		{% endfor %}
+
 	</table>
+        {% for c in casos_uso %}
+        {{ c.name }}<input type="checkbox" name="caso_uso_{{ c.name }}" value="references" {% if c.selected %} checked{% endif %}>
+        {% endfor %}
 <input type="submit" value="Actualizar">
 </form>
 {% endblock %}
